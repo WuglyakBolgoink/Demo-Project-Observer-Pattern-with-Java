@@ -23,14 +23,14 @@ public class ObserverMain {
 		}
     	 int key = System.in.read();
     	 while(key >= 0) {
-    	 if(Character.isLetter(key)) {
-    	 observable.addChar((char)key);
-    	 if(Character.isLowerCase(key)) {
-			observable.addChar((char)Character.toUpperCase(key));
-		}
-    	 observable.notifyObservers();
-    	 }
-    	 key = System.in.read();
+	    	 if(Character.isLetter(key)) {
+	    		 observable.addChar((char)key);
+		    	 if(Character.isLowerCase(key)) {
+					observable.addChar((char)Character.toUpperCase(key));
+				}
+		    	 observable.notifyObservers();
+	    	 }
+	    	 key = System.in.read();
     	 }
     }
 
