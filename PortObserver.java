@@ -31,20 +31,18 @@ public class PortObserver implements Observer{
 	public static final int PORT = 2000;
 	/** ServerPort. */
 	private static int sServerPort = PORT;
+	/** ServerSocket - clientSocket. */
+	private ServerSocket mServerSocket;
 	/** Unveränderliches Observable. */
 	private final StringObservable mObservable;
 	/** PrintWriter. */
 	private PrintWriter mPrintWriter;
-	/** BufferedReader. */
-	private BufferedReader mBufferedReader;
-	/** ServerSocket - clientSocket. */
-	private ServerSocket mServerSocket = null;
+//	/** BufferedReader. */
+//	private BufferedReader mBufferedReader;
 	/** clientSocket. */
 	private Socket mClientSocket;
 	/** current serverPort. */
 	private int mCurrentPort;
-	/** temporary string for BufferedReader. */
-	private String mTempString;
 
 	/**
 	 * PortObserver(StringObservable) - erwartet ein StringObservable.<br>
@@ -70,10 +68,13 @@ public class PortObserver implements Observer{
 					while (true) {
 						mClientSocket = mServerSocket.accept();
 						System.out.println(">>> new Client: " + getClientSocketInfo());
-						mBufferedReader = new BufferedReader(
+						final BufferedReader mBufferedReader = new BufferedReader(
 											new InputStreamReader(mClientSocket.getInputStream()));
 						mPrintWriter = new PrintWriter(
 										new OutputStreamWriter(mClientSocket.getOutputStream()));
+						/* temporary string for BufferedReader. */
+						@SuppressWarnings("unused")
+						String mTempString;
 						mTempString = mBufferedReader.readLine();
 						if (new InputStreamReader(mClientSocket.getInputStream()).read() == -1) {
 							System.out.println(getClientSocketInfo() + " disconnected");

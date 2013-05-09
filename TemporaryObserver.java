@@ -18,10 +18,10 @@ public class TemporaryObserver implements Observer {
 
 	/** Anzahl msec die ein Thread schlafen soll. */
 	public static final int SLEEP_TIME = 5000;
+	/** LOCK-Object. */
+	private static boolean mIsBlock = false;
 	/** Unveränderliches Observable. */
 	private final StringObservable mObservable;
-	/** LOCK-Object. */
-	private boolean mIsBlock = false;
 	/** Unveränderliches Observer. */
 	private final TemporaryObserver mSubscriber;
 
@@ -43,7 +43,7 @@ public class TemporaryObserver implements Observer {
 		final char lastChar = str.charAt(str.length()-1);
 
 		if (!isBlock()) {
-			if (isCharEqualsT(lastChar)) {
+			if (String.valueOf(lastChar).matches("T")) {
 					setBlock(true);
 						new Thread(new Runnable() {
 							@Override public void run() {
@@ -72,14 +72,14 @@ public class TemporaryObserver implements Observer {
 		mIsBlock = isBlock;
 	}
 
-	/**
-	 * prüft ob ein Zeichen "T" ist.
-	 *
-	 * @param inChar - char
-	 * @return true / false
-	 */
-	static boolean isCharEqualsT(final char inChar) {
-		return String.valueOf(inChar).matches("T");
-    }
+//	/**
+//	 * prüft ob ein Zeichen "T" ist.
+//	 *
+//	 * @param inChar - char
+//	 * @return true / false
+//	 */
+//	static boolean isCharEqualsT(final char inChar) {
+//		return String.valueOf(inChar).matches("T");
+//    }
 
 }

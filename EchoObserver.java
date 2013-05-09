@@ -48,30 +48,30 @@ public class EchoObserver implements Observer{
 		if (!isBlock()) {
 			System.out.printf("%s: new string available: %s%n", this, str);
 			if (!isSelf()) {
-				if (isVokal(lastChar)) {
+				if (String.valueOf(lastChar).matches("A|E|O|U|I")) {
 					for (int i=0;i < MAX_COUNT_VOKAL;i++) {
 						observable.addChar(lastChar);
 					}
 					setBlock(true);
 					observable.notifyObservers();
-				}
+				} // if vokal
 				setSelf(false);
-			}
+			} // if isSelf
 		} else {
 			setBlock(false);
 			setSelf(true);
 		}
 	}
 
-	/**
-	 * prüft ob ein Zeichen ist Vokal (A|E|O|U|I).
-	 *
-	 * @param inChar - char
-	 * @return true/false
-	 */
-	private boolean isVokal(final char inChar) {
-		return String.valueOf(inChar).matches("A|E|O|U|I");
-    }
+//	/**
+//	 * prüft ob ein Zeichen ist Vokal (A|E|O|U|I).
+//	 *
+//	 * @param inChar - char
+//	 * @return true/false
+//	 */
+//	private boolean isVokal(final char inChar) {
+//		return String.valueOf(inChar).matches("A|E|O|U|I");
+//    }
 
 	public boolean isBlock() {
 		return mBlock;
