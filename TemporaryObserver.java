@@ -16,6 +16,8 @@ import java.util.Observer;
 
 public class TemporaryObserver implements Observer {
 
+	/** Anzahl msec die ein Thread schlafen soll. */
+	public static final int SLEEP_TIME = 5000;
 	/** Unveränderliches Observable. */
 	private final StringObservable mObservable;
 	/** LOCK-Object. */
@@ -29,14 +31,14 @@ public class TemporaryObserver implements Observer {
 	 * @param observable - StringObservable
 	 */
 	public TemporaryObserver(final StringObservable observable) {
-		this.mObservable = observable;
+		mObservable = observable;
 		mSubscriber = this;
 		observable.addObserver(mSubscriber);
 	}
 
 
 	@Override
-	public void update(final Observable o, final Object arg) {
+	public void update(final Observable notused, final Object ignored) {
 		final String str = mObservable.getString();
 		final char lastChar = str.charAt(str.length()-1);
 
@@ -47,7 +49,7 @@ public class TemporaryObserver implements Observer {
 							@Override public void run() {
 								try {
 									mObservable.deleteObserver(mSubscriber);
-									Thread.sleep(5000);
+									Thread.sleep(SLEEP_TIME);
 									setBlock(false);
 									mObservable.addObserver(mSubscriber);
 								} catch (final InterruptedException e) {
@@ -62,21 +64,20 @@ public class TemporaryObserver implements Observer {
 		}
 	}
 
-	/**
-	 * @return the isBlock
-	 */
 	public boolean isBlock() {
 		return mIsBlock;
 	}
 
-
-	/**
-	 * @param isBlock the isBlock to set
-	 */
 	public void setBlock(final boolean isBlock) {
-		this.mIsBlock = isBlock;
+		mIsBlock = isBlock;
 	}
 
+	/**
+	 * prüft ob ein Zeichen "T" ist.
+	 *
+	 * @param inChar - char
+	 * @return true / false
+	 */
 	static boolean isCharEqualsT(final char inChar) {
 		return String.valueOf(inChar).matches("T");
     }

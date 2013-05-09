@@ -23,10 +23,10 @@ public class EchoObserver implements Observer{
 	/** Unveränderliches Observable. */
     private final StringObservable observable;
 
-    /** .*/
+    /** LOCK von andere Observer. */
     private boolean mBlock = false;
 
-    /** .*/
+    /** LOCK für selber. */
     private boolean mSelf = false;
 
 
@@ -41,7 +41,7 @@ public class EchoObserver implements Observer{
 	}
 
 	@Override
-	public void update(final Observable o, final Object arg) {
+	public void update(final Observable notused, final Object ignored) {
 		final String str = observable.getString();
 		final char lastChar = str.charAt(str.length()-1);
 
@@ -85,8 +85,8 @@ public class EchoObserver implements Observer{
 		return mSelf;
 	}
 
-	public void setSelf(final boolean bool) {
-		mSelf = bool;
+	public void setSelf(final boolean self) {
+		mSelf = self;
 	}
 
 }
