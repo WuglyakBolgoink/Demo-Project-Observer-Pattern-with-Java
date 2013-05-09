@@ -46,7 +46,7 @@ public class PortObserver implements Observer{
 		try {
 			curPort = PORT++;
 		 	serverSocket =  new ServerSocket(curPort);
-		 	System.out.println("Start Server with port: "+curPort);
+		 	System.out.println("======# Start Server with port: "+curPort+" #======");
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
@@ -58,10 +58,14 @@ public class PortObserver implements Observer{
 				try {
 					while (true) {
 						socket = serverSocket.accept();
-						System.out.println("new Client: "+socket);
+						System.out.println("======> new Client: "+socket.getInetAddress().getHostAddress() + ":" + socket.getPort() + " <======");
 						br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 						bos = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 						tmp = br.readLine();
+						if (new InputStreamReader(socket.getInputStream()).read() == -1) {
+							System.out.println("======< Client [" + socket.getInetAddress().getHostAddress() + ":" + socket.getPort() + "] disconnected >======");
+							socket = null;
+						}
 					}
 
 				} catch (final IOException e) {
@@ -72,9 +76,9 @@ public class PortObserver implements Observer{
 	}
 
 	@Override public void update(final Observable o, final Object arg) {
-		System.out.println("{Server:"+curPort+"} status: "+(socket!=null &&socket.isBound()?"connected":"disconnected"));
-		if (socket!=null && socket.isBound()) {
-			bos.write(this+": new string available: >>>"+observable.getString()+"<<<\n");
+		System.out.println("======# [Server:" + curPort + "]: " + (socket == null ? "OFF" : " ON <===> Client [" + socket.getInetAddress().getHostName() + ":" +socket.getPort()+"]") + " #======");
+		if (socket != null) {
+			bos.write(this + ": new string available: " + observable.getString() + "\n");
 			bos.flush();
 		}
 		observable.notifyObservers();
