@@ -19,7 +19,7 @@ public class TemporaryObserver implements Observer {
 	/** Anzahl msec die ein Thread schlafen soll. */
 	public static final int SLEEP_TIME = 5000;
 	/** LOCK-Object. */
-	private static boolean mIsBlock = false;
+	private boolean mIsBlock;
 	/** Unveränderliches Observable. */
 	private final StringObservable mObservable;
 	/** Unveränderliches Observer. */
@@ -71,15 +71,5 @@ public class TemporaryObserver implements Observer {
 	public void setBlock(final boolean isBlock) {
 		mIsBlock = isBlock;
 	}
-
-//	/**
-//	 * prüft ob ein Zeichen "T" ist.
-//	 *
-//	 * @param inChar - char
-//	 * @return true / false
-//	 */
-//	static boolean isCharEqualsT(final char inChar) {
-//		return String.valueOf(inChar).matches("T");
-//    }
 
 }

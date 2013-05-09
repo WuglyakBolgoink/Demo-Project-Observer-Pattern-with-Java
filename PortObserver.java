@@ -37,8 +37,6 @@ public class PortObserver implements Observer{
 	private final StringObservable mObservable;
 	/** PrintWriter. */
 	private PrintWriter mPrintWriter;
-//	/** BufferedReader. */
-//	private BufferedReader mBufferedReader;
 	/** clientSocket. */
 	private Socket mClientSocket;
 	/** current serverPort. */
@@ -73,9 +71,10 @@ public class PortObserver implements Observer{
 						mPrintWriter = new PrintWriter(
 										new OutputStreamWriter(mClientSocket.getOutputStream()));
 						/* temporary string for BufferedReader. */
-						@SuppressWarnings("unused")
-						String mTempString;
-						mTempString = mBufferedReader.readLine();
+//						@SuppressWarnings("unused")
+//						String mTempString;
+//						mTempString = mBufferedReader.readLine();
+						mBufferedReader.readLine();
 						if (new InputStreamReader(mClientSocket.getInputStream()).read() == -1) {
 							System.out.println(getClientSocketInfo() + " disconnected");
 							mClientSocket = null;
