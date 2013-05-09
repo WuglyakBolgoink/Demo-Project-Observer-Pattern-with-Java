@@ -14,27 +14,26 @@ import java.util.Observer;
  *
  * @author "Elderov Ali, IF4B"
  */
-/*
- $ java ObserverMain StringObserver EchoObserver
-ab
-StringObserver@15660ef: new string available: aA
-EchoObserver@9d1714: new string available: aA
-StringObserver@15660ef: new string available: aAAAAAA
-StringObserver@15660ef: new string available: aAAAAAAbB
-EchoObserver@9d1714: new string available: aAAAAAAbB
-*/
+
 public class EchoObserver implements Observer{
+
+	/** maximale Anzahl vokalen. */
+	public static final int MAX_COUNT_VOKAL = 5;
 
 	/** Unveränderliches Observable. */
     private final StringObservable observable;
 
-    private boolean isBlock = false;
+    /** .*/
+    private boolean mBlock = false;
 
-    private boolean bool = false;
+    /** .*/
+    private boolean mSelf = false;
 
-    public static int MAX_COUNT_VOKAL = 5;
+
 	/**
-	 * @param observable
+	 * Konstruktor.
+	 *
+	 * @param observable - StringObservable
 	 */
 	public EchoObserver(final StringObservable observable) {
 		this.observable = observable;
@@ -48,7 +47,7 @@ public class EchoObserver implements Observer{
 
 		if (!isBlock()) {
 			System.out.printf("%s: new string available: %s%n", this, str);
-			if (!isBool()) {
+			if (!isSelf()) {
 				if (isVokal(lastChar)) {
 					for (int i=0;i < MAX_COUNT_VOKAL;i++) {
 						observable.addChar(lastChar);
@@ -56,32 +55,38 @@ public class EchoObserver implements Observer{
 					setBlock(true);
 					observable.notifyObservers();
 				}
-				setBool(false);
+				setSelf(false);
 			}
 		} else {
 			setBlock(false);
-			setBool(true);
+			setSelf(true);
 		}
 	}
 
-	boolean isVokal(final char inChar) {
+	/**
+	 * prüft ob ein Zeichen ist Vokal (A|E|O|U|I).
+	 *
+	 * @param inChar - char
+	 * @return true/false
+	 */
+	private boolean isVokal(final char inChar) {
 		return String.valueOf(inChar).matches("A|E|O|U|I");
     }
 
 	public boolean isBlock() {
-		return isBlock;
+		return mBlock;
 	}
 
 	public void setBlock(final boolean isBlock) {
-		this.isBlock = isBlock;
+		mBlock = isBlock;
 	}
 
-	public boolean isBool() {
-		return bool;
+	public boolean isSelf() {
+		return mSelf;
 	}
 
-	public void setBool(final boolean bool) {
-		this.bool = bool;
+	public void setSelf(final boolean bool) {
+		mSelf = bool;
 	}
 
 }

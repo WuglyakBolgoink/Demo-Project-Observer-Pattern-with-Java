@@ -23,51 +23,63 @@ import java.util.Observer;
  * wartet der Portobserver auf den nächsten Client.
  * Bis dahin verwirft der Portobserver Meldungen.
  *
- * Zum Testen eignet sich beispielweise der Telnet-Client.
- *
- *
  * @author "Elderov Ali, IF4B"
  */
 
 public class PortObserver implements Observer{
-	private final StringObservable observable;
-	public static int PORT = 2000;
-	private PrintWriter bos;
-	private BufferedReader br;
-	private ServerSocket serverSocket = null;
-	private Socket socket;
-	private int curPort;
-	private String tmp;
+	/** default server port. */
+	public static final int PORT = 2000;
+	/** ServerPort. */
+	private static int sServerPort = PORT;
+	/** Unveränderliches Observable. */
+	private final StringObservable mObservable;
+	/** PrintWriter. */
+	private PrintWriter mPrintWriter;
+	/** BufferedReader. */
+	private BufferedReader mBufferedReader;
+	/** ServerSocket - clientSocket. */
+	private ServerSocket mServerSocket = null;
+	/** clientSocket. */
+	private Socket mClientSocket;
+	/** current serverPort. */
+	private int mCurrentPort;
+	/** temporary string for BufferedReader. */
+	private String mTempString;
 
 	/**
-	 * @param observable
+	 * PortObserver(StringObservable) - erwartet ein StringObservable.<br>
+	 * Startet ein Thread mit ServerSocket mit currentPort,
+	 * wartet auf Client, wenn client disconnected erzetzt clientSocket auf null.
+	 *
+	 * @param observable - StringObservable
 	 */
 	public PortObserver(final StringObservable observable) {
 		try {
-			curPort = PORT++;
-		 	serverSocket =  new ServerSocket(curPort);
-		 	System.out.println("======# Start Server with port: "+curPort+" #======");
-		} catch (final IOException e) {
-			e.printStackTrace();
+			mCurrentPort = sServerPort++;
+		 	mServerSocket =  new ServerSocket(mCurrentPort);
+		 	System.out.println("======# Start Server with port: "+mCurrentPort+" #======");
+		} catch (final IOException ioe) {
+			ioe.printStackTrace();
 		}
-		this.observable = observable;
+		mObservable = observable;
 		observable.addObserver(this);
 
 		new Thread(new Runnable() {
 			@Override public void run() {
 				try {
 					while (true) {
-						socket = serverSocket.accept();
-						System.out.println("======> new Client: "+socket.getInetAddress().getHostAddress() + ":" + socket.getPort() + " <======");
-						br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-						bos = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
-						tmp = br.readLine();
-						if (new InputStreamReader(socket.getInputStream()).read() == -1) {
-							System.out.println("======< Client [" + socket.getInetAddress().getHostAddress() + ":" + socket.getPort() + "] disconnected >======");
-							socket = null;
+						mClientSocket = mServerSocket.accept();
+						System.out.println(">>> new Client: " + getClientSocketInfo());
+						mBufferedReader = new BufferedReader(
+											new InputStreamReader(mClientSocket.getInputStream()));
+						mPrintWriter = new PrintWriter(
+										new OutputStreamWriter(mClientSocket.getOutputStream()));
+						mTempString = mBufferedReader.readLine();
+						if (new InputStreamReader(mClientSocket.getInputStream()).read() == -1) {
+							System.out.println(getClientSocketInfo() + " disconnected");
+							mClientSocket = null;
 						}
 					}
-
 				} catch (final IOException e) {
 					e.printStackTrace();
 				}
@@ -75,13 +87,32 @@ public class PortObserver implements Observer{
 		}).start();
 	}
 
-	@Override public void update(final Observable o, final Object arg) {
-		System.out.println("======# [Server:" + curPort + "]: " + (socket == null ? "OFF" : " ON <===> Client [" + socket.getInetAddress().getHostName() + ":" +socket.getPort()+"]") + " #======");
-		if (socket != null) {
-			bos.write(this + ": new string available: " + observable.getString() + "\n");
-			bos.flush();
+
+	/**
+	 * Gibt hilfsinformation ob server hat eine verbindung mit Client oder nein.
+	 * Falls ja, zeigt meldung von observable.
+	 *
+	 * @param notused Ein Stringobservable.
+     * @param ignored Unbenutztes Objekt.
+	 */
+	@Override public void update(final Observable notused, final Object ignored) {
+		System.out.println("[Server:" + mCurrentPort + "]: "
+				+ (mClientSocket == null ? "OFF" : " ON <===> " + getClientSocketInfo()));
+		if (mClientSocket != null) {
+			mPrintWriter.write(this + ": new string available: " + mObservable.getString() + "\n");
+			mPrintWriter.flush();
 		}
-		observable.notifyObservers();
+		mObservable.notifyObservers();
 	}
 
+	/**
+	 * Gibt String "Client [IP:PORT]" zurück.
+	 *
+	 * @return String
+	 */
+	private String getClientSocketInfo() {
+		return "Client ["
+				+ mClientSocket.getInetAddress().getHostAddress() + ":" + mClientSocket.getPort()
+				+ "]";
+	}
 }

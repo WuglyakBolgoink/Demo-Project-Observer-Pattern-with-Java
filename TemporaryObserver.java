@@ -13,51 +13,43 @@ import java.util.Observer;
  *
  * @author "Elderov Ali, IF4B"
  */
-/*
-$ java ObserverMain StringObserver TemporaryObserver
-a
-TemporaryObserver@dc5733: new string available: aA
-StringObserver@1e0f790: new string available: aA
-t
-StringObserver@1e0f790: new string available: aAtT
-cd
-StringObserver@1e0f790: new string available: aAtTcC
-StringObserver@1e0f790: new string available: aAtTcCdD
-e                                                   # 10 Sekunden später
-TemporaryObserver@dc5733: new string available: aAtTcCdDeE
-StringObserver@1e0f790: new string available: aAtTcCdDeE
- */
+
 public class TemporaryObserver implements Observer {
 
-	private final StringObservable observable;
-	private boolean isBlock = false;
-	private final TemporaryObserver subscriber;
+	/** Unveränderliches Observable. */
+	private final StringObservable mObservable;
+	/** LOCK-Object. */
+	private boolean mIsBlock = false;
+	/** Unveränderliches Observer. */
+	private final TemporaryObserver mSubscriber;
 
 	/**
-	 * @param stringObservable
+	 * Konstruktor.
+	 *
+	 * @param observable - StringObservable
 	 */
 	public TemporaryObserver(final StringObservable observable) {
-		this.observable = observable;
-		subscriber = this;
-		observable.addObserver(subscriber);
+		this.mObservable = observable;
+		mSubscriber = this;
+		observable.addObserver(mSubscriber);
 	}
 
 
 	@Override
 	public void update(final Observable o, final Object arg) {
-		final String str = observable.getString();
+		final String str = mObservable.getString();
 		final char lastChar = str.charAt(str.length()-1);
 
 		if (!isBlock()) {
-			if (isT(lastChar)) {
+			if (isCharEqualsT(lastChar)) {
 					setBlock(true);
 						new Thread(new Runnable() {
 							@Override public void run() {
 								try {
-									observable.deleteObserver(subscriber);
+									mObservable.deleteObserver(mSubscriber);
 									Thread.sleep(5000);
 									setBlock(false);
-									observable.addObserver(subscriber);
+									mObservable.addObserver(mSubscriber);
 								} catch (final InterruptedException e) {
 									e.printStackTrace();
 								}
@@ -74,7 +66,7 @@ public class TemporaryObserver implements Observer {
 	 * @return the isBlock
 	 */
 	public boolean isBlock() {
-		return isBlock;
+		return mIsBlock;
 	}
 
 
@@ -82,10 +74,10 @@ public class TemporaryObserver implements Observer {
 	 * @param isBlock the isBlock to set
 	 */
 	public void setBlock(final boolean isBlock) {
-		this.isBlock = isBlock;
+		this.mIsBlock = isBlock;
 	}
 
-	static boolean isT(final char inChar) {
+	static boolean isCharEqualsT(final char inChar) {
 		return String.valueOf(inChar).matches("T");
     }
 

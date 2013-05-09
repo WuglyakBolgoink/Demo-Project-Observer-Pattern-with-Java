@@ -11,11 +11,19 @@ import java.util.Observer;
  */
 public class ObserverFactory {
 
+	/**
+	 * Erwartet observerTyp und StringObservable.
+	 *
+	 * @param args - String
+	 * @param observable - StringObservable
+	 * @return observer, sonst null
+	 */
 	@SuppressWarnings("unchecked")
 	public static Observer make(final String args, final StringObservable observable) {
 		try {
 			final Class<?> observerClass = Class.forName(args);
-			final Constructor<Observer>[] constructors = (Constructor<Observer>[]) observerClass.getConstructors();
+			final Constructor<Observer>[] constructors =
+						(Constructor<Observer>[]) observerClass.getConstructors();
 			final Constructor<Observer> firstConstuctor = constructors[0];
 			return firstConstuctor.newInstance(observable);
 		} catch (final ReflectiveOperationException roe) {
