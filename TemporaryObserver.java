@@ -36,7 +36,6 @@ public class TemporaryObserver implements Observer {
 		observable.addObserver(mSubscriber);
 	}
 
-
 	@Override
 	public void update(final Observable notused, final Object ignored) {
 		final String str = mObservable.getString();

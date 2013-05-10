@@ -66,24 +66,10 @@ public class PortObserver implements Observer{
 		startThread();
 	}
 
-	/** setter. */
+	/** serverPort Increment fŸr andere neue Connections. */
 	public static void setServerPort() {
 		sServerPort++;
 	}
-//	/**
-//	 * getter mCurrentPort.
-//	 * @return int - current port number
-//	 */
-//	public int getCurrentPort() {return mCurrentPort;}
-
-//	/**
-//	 * setter mCurrentPort.
-//	 */
-//	public void setCurrentPort() {
-//		mCurrentPort = sServerPort;
-//		sServerPort++;
-//	}
-
 
 	/**
 	 * start Thread.
@@ -102,7 +88,6 @@ public class PortObserver implements Observer{
 						mPrintWriter = new PrintWriter(
 										new OutputStreamWriter(mClientSocket.getOutputStream(), DEFAULT_ENCODING));
 						mBufferedReader.readLine();
-						System.out.println("test-> "+new InputStreamReader(mClientSocket.getInputStream(), DEFAULT_ENCODING).read());
 						if (new InputStreamReader(mClientSocket.getInputStream(), DEFAULT_ENCODING).read() == -1) {
 							System.out.println(getClientSocketInfo() + " disconnected");
 							mClientSocket = null;

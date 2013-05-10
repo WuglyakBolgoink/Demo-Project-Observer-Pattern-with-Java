@@ -52,7 +52,7 @@ public class EchoObserver implements Observer{
 			final char lastChar = str.charAt(str.length()-1);
 			System.out.printf("%s: new string available: %s%n", this, str);
 			if (!isSelf()) {
-				if (String.valueOf(lastChar).matches("Y|A|E|O|U|I")) {
+				if (String.valueOf(lastChar).matches("A|E|O|U|I")) {
 					for (int i=0;i < MAX_COUNT_VOKAL;i++) {
 						observable.addChar(lastChar);
 					}
