@@ -29,6 +29,8 @@ import java.util.Observer;
 public class PortObserver implements Observer{
 	/** default server port. */
 	public static final int PORT = 2000;
+	/**	Default Encoding for Input/OutputStreamReader. */
+	public static final String DEFAULT_ENCODING = "UTF8";
 	/** ServerPort. */
 	private static int sServerPort = PORT;
 	/** ServerSocket - clientSocket. */
@@ -36,9 +38,9 @@ public class PortObserver implements Observer{
 	/** UnverŠnderliches Observable. */
 	private final StringObservable mObservable;
 	/** PrintWriter. */
-	private PrintWriter mPrintWriter;
+	private PrintWriter mPrintWriter = null;
 	/** clientSocket. */
-	private Socket mClientSocket;
+	private Socket mClientSocket = null;
 	/** current serverPort. */
 	private int mCurrentPort;
 
@@ -50,9 +52,9 @@ public class PortObserver implements Observer{
 	 * @param observable - StringObservable
 	 */
 	public PortObserver(final StringObservable observable) {
+		setCurrentPort();
 		try {
-			mCurrentPort = sServerPort++;
-		 	mServerSocket =  new ServerSocket(mCurrentPort);
+		 	mServerSocket =  new ServerSocket(getCurrentPort());
 		 	System.out.println("======# Start Server with port: "+mCurrentPort+" #======");
 		} catch (final IOException ioe) {
 			ioe.printStackTrace();
@@ -60,22 +62,43 @@ public class PortObserver implements Observer{
 		mObservable = observable;
 		observable.addObserver(this);
 
+		startThread();
+	}
+
+	/**
+	 * getter mCurrentPort.
+	 * @return int - current port number
+	 */
+	public int getCurrentPort() {return mCurrentPort;}
+
+	/**
+	 * setter mCurrentPort.
+	 */
+	public void setCurrentPort() {
+		mCurrentPort = sServerPort;
+		sServerPort++;
+	}
+
+
+	/**
+	 * start Thread.
+	 */
+	private void startThread() {
 		new Thread(new Runnable() {
 			@Override public void run() {
 				try {
 					while (true) {
 						mClientSocket = mServerSocket.accept();
 						System.out.println(">>> new Client: " + getClientSocketInfo());
+
 						final BufferedReader mBufferedReader = new BufferedReader(
-											new InputStreamReader(mClientSocket.getInputStream()));
+								new InputStreamReader(mClientSocket.getInputStream(), DEFAULT_ENCODING));
+
 						mPrintWriter = new PrintWriter(
-										new OutputStreamWriter(mClientSocket.getOutputStream()));
-						/* temporary string for BufferedReader. */
-//						@SuppressWarnings("unused")
-//						String mTempString;
-//						mTempString = mBufferedReader.readLine();
+										new OutputStreamWriter(mClientSocket.getOutputStream(), DEFAULT_ENCODING));
 						mBufferedReader.readLine();
-						if (new InputStreamReader(mClientSocket.getInputStream()).read() == -1) {
+						System.out.println("test-> "+new InputStreamReader(mClientSocket.getInputStream(), DEFAULT_ENCODING).read());
+						if (new InputStreamReader(mClientSocket.getInputStream(), DEFAULT_ENCODING).read() == -1) {
 							System.out.println(getClientSocketInfo() + " disconnected");
 							mClientSocket = null;
 						}
@@ -87,7 +110,6 @@ public class PortObserver implements Observer{
 		}).start();
 	}
 
-
 	/**
 	 * Gibt hilfsinformation ob server hat eine verbindung mit Client oder nein.
 	 * Falls ja, zeigt meldung von observable.
@@ -96,7 +118,7 @@ public class PortObserver implements Observer{
      * @param ignored Unbenutztes Objekt.
 	 */
 	@Override public void update(final Observable notused, final Object ignored) {
-		System.out.println("[Server:" + mCurrentPort + "]: "
+		System.out.println("[Server:" + getCurrentPort() + "]: "
 				+ (mClientSocket == null ? "OFF" : " ON <===> " + getClientSocketInfo()));
 		if (mClientSocket != null) {
 			mPrintWriter.write(this + ": new string available: " + mObservable.getString() + "\n");
@@ -112,7 +134,6 @@ public class PortObserver implements Observer{
 	 */
 	private String getClientSocketInfo() {
 		return "Client ["
-				+ mClientSocket.getInetAddress().getHostAddress() + ":" + mClientSocket.getPort()
-				+ "]";
+				+ mClientSocket.getInetAddress().getHostAddress()+":"+mClientSocket.getPort() + "]";
 	}
 }
