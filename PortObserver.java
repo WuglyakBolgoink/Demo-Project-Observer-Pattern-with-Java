@@ -33,16 +33,17 @@ public class PortObserver implements Observer{
 	public static final String DEFAULT_ENCODING = "UTF8";
 	/** ServerPort. */
 	private static int sServerPort = PORT;
+
 	/** ServerSocket - clientSocket. */
 	private ServerSocket mServerSocket;
 	/** Unveränderliches Observable. */
 	private final StringObservable mObservable;
 	/** PrintWriter. */
-	private PrintWriter mPrintWriter = null;
+	private PrintWriter mPrintWriter;
 	/** clientSocket. */
-	private Socket mClientSocket = null;
+	private Socket mClientSocket;
 	/** current serverPort. */
-	private int mCurrentPort;
+	private final int mCurrentPort = sServerPort;
 
 	/**
 	 * PortObserver(StringObservable) - erwartet ein StringObservable.<br>
@@ -52,32 +53,36 @@ public class PortObserver implements Observer{
 	 * @param observable - StringObservable
 	 */
 	public PortObserver(final StringObservable observable) {
-		setCurrentPort();
+
 		try {
-		 	mServerSocket =  new ServerSocket(getCurrentPort());
+		 	mServerSocket =  new ServerSocket(mCurrentPort);
 		 	System.out.println("======# Start Server with port: "+mCurrentPort+" #======");
+		 	setServerPort();
 		} catch (final IOException ioe) {
 			ioe.printStackTrace();
 		}
 		mObservable = observable;
 		observable.addObserver(this);
-
 		startThread();
 	}
 
-	/**
-	 * getter mCurrentPort.
-	 * @return int - current port number
-	 */
-	public int getCurrentPort() {return mCurrentPort;}
-
-	/**
-	 * setter mCurrentPort.
-	 */
-	public void setCurrentPort() {
-		mCurrentPort = sServerPort;
+	/** setter. */
+	public static void setServerPort() {
 		sServerPort++;
 	}
+//	/**
+//	 * getter mCurrentPort.
+//	 * @return int - current port number
+//	 */
+//	public int getCurrentPort() {return mCurrentPort;}
+
+//	/**
+//	 * setter mCurrentPort.
+//	 */
+//	public void setCurrentPort() {
+//		mCurrentPort = sServerPort;
+//		sServerPort++;
+//	}
 
 
 	/**
@@ -115,10 +120,10 @@ public class PortObserver implements Observer{
 	 * Falls ja, zeigt meldung von observable.
 	 *
 	 * @param notused Ein Stringobservable.
-     * @param ignored Unbenutztes Objekt.
+	 * @param ignored Unbenutztes Objekt.
 	 */
 	@Override public void update(final Observable notused, final Object ignored) {
-		System.out.println("[Server:" + getCurrentPort() + "]: "
+		System.out.println("[Server:" + mCurrentPort + "]: "
 				+ (mClientSocket == null ? "OFF" : " ON <===> " + getClientSocketInfo()));
 		if (mClientSocket != null) {
 			mPrintWriter.write(this + ": new string available: " + mObservable.getString() + "\n");
