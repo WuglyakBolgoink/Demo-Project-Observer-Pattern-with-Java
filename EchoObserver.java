@@ -23,12 +23,8 @@ public class EchoObserver implements Observer{
 	/** Unveränderliches Observable. */
     private final StringObservable observable;
 
-    /** LOCK von andere Observer. */
-    private boolean mBlock;
-
     /** LOCK für selber. */
     private boolean mSelf;
-
 
 	/**
 	 * Konstruktor.
@@ -37,39 +33,25 @@ public class EchoObserver implements Observer{
 	 */
 	public EchoObserver(final StringObservable observable) {
 		this.observable = observable;
-		mBlock = false;
 		mSelf = false;
 		observable.addObserver(this);
 	}
 
 	@Override
 	public void update(final Observable notused, final Object ignored) {
-		if (isBlock()) {
-			setBlock(false);
-			setSelf(true);
-		} else {
+		if (!isSelf()) {
 			final String str = observable.getString();
 			final char lastChar = str.charAt(str.length()-1);
 			System.out.printf("%s: new string available: %s%n", this, str);
-			if (!isSelf()) {
-				if (String.valueOf(lastChar).matches("A|E|O|U|I")) {
-					for (int i=0;i < MAX_COUNT_VOKAL;i++) {
-						observable.addChar(lastChar);
-					}
-					setBlock(true);
-					observable.notifyObservers();
-				} // if vokal
+			if (String.valueOf(lastChar).matches("A|E|O|U|I")) {
+				setSelf(true);
+				for (int i=0;i<MAX_COUNT_VOKAL;i++) {
+					observable.addChar(lastChar);
+				}
+				observable.notifyObservers();
 				setSelf(false);
-			} // if isSelf
+			} // if vokal
 		}
-	}
-
-	public boolean isBlock() {
-		return mBlock;
-	}
-
-	public void setBlock(final boolean isBlock) {
-		mBlock = isBlock;
 	}
 
 	public boolean isSelf() {
